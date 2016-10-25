@@ -3,20 +3,20 @@ import sys
 from curses import ascii
 
 def sendsms(phoneNumber, message):
-    serial_port = serial.Serial('/dev/ttyUSB1')
+    serial_port = serial.Serial('/dev/ttyUSB1', 460800, timeout=1, dsrdtr=True, rtscts=True)
     print(serial_port.name)  # Checando se a porta está em uso
 
-    serial_port.write("AT\r\n")
-    line = serial_port.readline(size=None, eol='\r\n')
+    serial_port.write("AT\r\n".encode('ascii'))
+    line = serial_port.readline()
     print(line)
 
-    serial_port.write("AT+CMGF=1\r\n")
-    line = serial_port.readline(size=None, eol='\r\n')
+    serial_port.write("AT+CMGF=1\r\n".encode('ascii'))
+    line = serial_port.readline()
     print(line)
 
-    serial_port.write('AT+CMGS="{phoneNumber}"\r\n'.format(phoneNumber))
-    serial_port.write(message)
-    serial_port.write(ascii.ctrl('z'))
+    serial_port.write(('AT+CMGS="{phoneNumber}"\r\n'.format(phoneNumber=phoneNumber)).encode('ascii'))
+    serial_port.write(message.encode('ascii'))
+    serial_port.write(ascii.ctrl('z').encode())
     print(serial_port.readline())
     serial_port.close()
     return
